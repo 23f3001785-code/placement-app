@@ -1,0 +1,644 @@
+openapi: 3.0.0
+info:
+  title: Instihire Placement Portal API
+  description: API documentation for the Instihire backend (Flask + SQLAlchemy).
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Local Development Server
+
+components:
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+        is_active:
+          type: boolean
+
+    CompanyProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        company_name:
+          type: string
+        hr_contact:
+          type: string
+        hr_phone:
+          type: string
+        website:
+          type: string
+        is_approved:
+          type: boolean
+
+    StudentProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        full_name:
+          type: string
+        degree:
+          type: string
+        branch:
+          type: string
+        college_name:
+          type: string
+        cgpa:
+          type: number
+        graduation_year:
+          type: integer
+        resume_url:
+          type: string
+
+    Drive:
+      type: object
+      properties:
+        id:
+          type: integer
+        job_title:
+          type: string
+        job_description:
+          type: string
+        company_name:
+          type: string
+        required_degree:
+          type: string
+        required_branch:
+          type: string
+        min_cgpa:
+          type: number
+        deadline:
+          type: string
+          format: date-time
+        interview_mode:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Application:
+      type: object
+      properties:
+        id:
+          type: integer
+        student_name:
+          type: string
+        company_name:
+          type: string
+        job_title:
+          type: string
+        status:
+          type: string
+        applied_on:
+          type: string
+          format: date-time
+
+security:
+  - tokenAuth: []
+
+paths:
+  /api/auth/login:
+    post:
+      summary: User login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+
+  /api/auth/register/company:
+    post:
+      summary: Register as a company
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - company_name
+                - hr_contact
+                - hr_phone
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                company_name:
+                  type: string
+                hr_contact:
+                  type: string
+                hr_phone:
+                  type: string
+                website:
+                  type: string
+      responses:
+        '201':
+          description: Company registered successfully
+        '400':
+          description: Missing required fields or invalid data
+
+  /api/auth/register/student:
+    post:
+      summary: Register as a student
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - full_name
+                - college_name
+                - degree
+                - branch
+                - cgpa
+                - graduation_year
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                full_name:
+                  type: string
+                college_name:
+                  type: string
+                degree:
+                  type: string
+                branch:
+                  type: string
+                cgpa:
+                  type: number
+                graduation_year:
+                  type: integer
+      responses:
+        '201':
+          description: Student registered successfully
+        '400':
+          description: Missing/invalid fields
+
+  /api/admin/stats:
+    get:
+      summary: Get system statistics
+      responses:
+        '200':
+          description: Stats regarding students, companies and drives
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_students:
+                    type: integer
+                  total_companies:
+                    type: integer
+                  total_drives:
+                    type: integer
+
+  /api/admin/companies:
+    get:
+      summary: List all companies
+      responses:
+        '200':
+          description: List of company profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompanyProfile'
+
+  /api/admin/companies/{company_id}/approve:
+    post:
+      summary: Approve a company registration
+      parameters:
+        - in: path
+          name: company_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Company approved
+
+  /api/admin/companies/{company_id}/reject:
+    post:
+      summary: Reject a company registration
+      parameters:
+        - in: path
+          name: company_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Company rejected
+
+  /api/admin/companies/{company_id}:
+    delete:
+      summary: Delete a company
+      parameters:
+        - in: path
+          name: company_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Company deleted
+
+  /api/admin/students:
+    get:
+      summary: List all students
+      responses:
+        '200':
+          description: List of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentProfile'
+
+  /api/admin/students/{student_id}:
+    delete:
+      summary: Delete a student
+      parameters:
+        - in: path
+          name: student_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Student deleted
+
+  /api/admin/users/{user_id}/blacklist:
+    post:
+      summary: Blacklist/Whitelist a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User blacklisted/activated status updated
+
+  /api/admin/drives:
+    get:
+      summary: List all placement drives
+      responses:
+        '200':
+          description: List of drives
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Drive'
+
+  /api/admin/drives/{drive_id}/{status}:
+    post:
+      summary: Update drive status (Approved/Rejected)
+      parameters:
+        - in: path
+          name: drive_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: status
+          required: true
+          schema:
+            type: string
+            enum: [Approved, Rejected]
+      responses:
+        '200':
+          description: Status updated
+
+  /api/admin/drives/{drive_id}:
+    delete:
+      summary: Delete a placement drive
+      parameters:
+        - in: path
+          name: drive_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Placement drive deleted
+
+  /api/admin/applications:
+    get:
+      summary: List all applications
+      responses:
+        '200':
+          description: List of all applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+  /api/admin/applications/{app_id}:
+    delete:
+      summary: Delete an application
+      parameters:
+        - in: path
+          name: app_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Application deleted
+
+  /api/company/profile:
+    get:
+      summary: Get company profile and stats
+      responses:
+        '200':
+          description: Profile details
+
+  /api/company/drives:
+    get:
+      summary: List company's own drives
+      responses:
+        '200':
+          description: List of drives created by the company
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Drive'
+    post:
+      summary: Create a new placement drive
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - job_title
+                - job_description
+                - deadline
+              properties:
+                job_title:
+                  type: string
+                job_description:
+                  type: string
+                deadline:
+                  type: string
+                  format: date-time
+                min_cgpa:
+                  type: number
+                required_degree:
+                  type: string
+                required_branch:
+                  type: string
+                interview_mode:
+                  type: string
+      responses:
+        '201':
+          description: Drive created successfully
+
+  /api/company/drives/{drive_id}/deadline:
+    put:
+      summary: Update drive deadline
+      parameters:
+        - in: path
+          name: drive_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deadline:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Deadline updated successfully
+
+  /api/company/drives/{drive_id}:
+    delete:
+      summary: Delete a company drive
+      parameters:
+        - in: path
+          name: drive_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Drive deleted successfully
+
+  /api/company/drives/{drive_id}/applications:
+    get:
+      summary: View applications for a specific drive
+      parameters:
+        - in: path
+          name: drive_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of applicants
+
+  /api/company/applications/{app_id}/status:
+    post:
+      summary: Update application status
+      parameters:
+        - in: path
+          name: app_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [Shortlisted, Selected, Rejected]
+      responses:
+        '200':
+          description: Status updated successfully
+
+  /api/company/applications/{app_id}:
+    delete:
+      summary: Delete an application
+      parameters:
+        - in: path
+          name: app_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Application removed successfully
+
+  /api/student/profile:
+    get:
+      summary: Get student profile
+      responses:
+        '200':
+          description: Profile details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentProfile'
+    put:
+      summary: Update student profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                college_name:
+                  type: string
+                degree:
+                  type: string
+                branch:
+                  type: string
+                cgpa:
+                  type: number
+                graduation_year:
+                  type: integer
+      responses:
+        '200':
+          description: Profile updated
+
+  /api/student/profile:
+    post:
+      summary: Update student profile including resume upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                resume:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Profile updated
+
+  /api/student/drives:
+    get:
+      summary: List available (approved) drives for students
+      responses:
+        '200':
+          description: List of drives
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Drive'
+
+  /api/student/drives/{drive_id}/apply:
+    post:
+      summary: Apply to a placement drive
+      parameters:
+        - in: path
+          name: drive_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Applied successfully
+        '403':
+          description: Eligibility rules not met
+
+  /api/student/applications:
+    get:
+      summary: List student's own applications
+      responses:
+        '200':
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+
+  /api/student/export:
+    get:
+      summary: Export student application history as CSV
+      responses:
+        '200':
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary

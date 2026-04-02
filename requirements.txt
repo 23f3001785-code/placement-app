@@ -1,0 +1,7 @@
+celery==5.5.3
+Flask==2.2.5
+Flask_Caching==2.1.0
+flask_cors==6.0.1
+flask_jwt_extended==4.7.1
+flask_sqlalchemy==3.1.1
+Werkzeug==2.2.2

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instihire | Global Placement Drive</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/frontend/favicon.svg?v=2">
+    <!-- Google Fonts -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/css/styles.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+
+    <!-- Vue 3 CDN (Development or Production) -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Vue Router CDN -->
+    <script src="https://unpkg.com/vue-router@4.2.5/dist/vue-router.global.js"></script>
+    <!-- Axios for API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="wf-bg-white text-dark">
+    <div id="app">
+        <navbar></navbar>
+
+        <div class="wf-main-content">
+            <router-view></router-view>
+        </div>
+
+        <!-- Global Footer -->
+        <app-footer v-if="showFooter"></app-footer>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Components -->
+    <script src="/frontend/js/components/Navbar.js"></script>
+    <script src="/frontend/js/components/Footer.js"></script>
+    <script src="/frontend/js/views/Home.js"></script>
+    <script src="/frontend/js/views/auth/Login.js"></script>
+    <script src="/frontend/js/views/auth/Register.js?v=4"></script>
+    <!-- Admin Views -->
+    <script src="/frontend/js/views/dashboard/admin/AdminDashboard.js?v=14"></script>
+
+    <!-- Company Dashboard -->
+    <script src="/frontend/js/views/dashboard/company/ManageDrives.js?v=7"></script>
+    <script src="/frontend/js/views/dashboard/company/ReviewCandidates.js?v=2"></script>
+    <script src="/frontend/js/views/dashboard/company/CompanyDashboard.js?v=5"></script>
+
+    <!-- Student Dashboard (child components first, then shell) -->
+    <script src="/frontend/js/views/dashboard/student/StudentOverview.js?v=2"></script>
+    <script src="/frontend/js/views/dashboard/student/StudentOpenRoles.js?v=2"></script>
+    <script src="/frontend/js/views/dashboard/student/StudentMyApps.js?v=3"></script>
+    <script src="/frontend/js/views/dashboard/student/StudentProfile.js?v=3"></script>
+    <script src="/frontend/js/views/dashboard/student/StudentDashboard.js?v=11"></script>
+
+    <!-- Router and main initialization -->
+    <script src="/frontend/js/app.js?v=4"></script>
+</body>
+
+</html>
